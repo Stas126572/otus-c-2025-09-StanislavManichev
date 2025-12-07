@@ -1,0 +1,10 @@
+DEBUG(main.c, 14): Hello World!
+INFO(main.c, 15): Hello World!
+WARNING(main.c, 16): Hello World!
+ERROR(main.c, 17): Hello World!
+Backlog of 5 function
+./tests(+0x1423) [0x5583a6a02423]
+./tests(+0x132d) [0x5583a6a0232d]
+/lib/x86_64-linux-gnu/libc.so.6(+0x29d90) [0x7f82f4c9fd90]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0x80) [0x7f82f4c9fe40]
+./tests(+0x1185) [0x5583a6a02185]
