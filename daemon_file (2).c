@@ -17,9 +17,9 @@ int daemonizate() {
   if (setsid() < 0)
     exit(1);
   chdir("/");
-  close(0);
-  close(1);
-  close(2);
+  close(stdin);
+  close(stdout);
+  close(stderr);
 }
 
 int main(int argc, char **argv) {
