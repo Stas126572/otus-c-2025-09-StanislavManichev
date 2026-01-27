@@ -25,12 +25,11 @@ struct connection {
     size_t total;
 };
 
-// Простая очистка Telnet-последовательностей (0xFF ...)
 void filter_telnet(char *buf, size_t *len) {
     size_t j = 0;
     for (size_t i = 0; i < *len; i++) {
-        if ((unsigned char)buf[i] == 255) { // IAC
-            i += 2; // Пропускаем команду (3 байта)
+        if ((unsigned char)buf[i] == 255) { 
+            i += 2; 
             continue;
         }
         buf[j++] = buf[i];
@@ -53,7 +52,10 @@ int main(int argc, char *argv[]) {
     hints.ai_family = AF_INET;
     hints.ai_socktype = SOCK_STREAM;
 
-    if (getaddrinfo("telehack.com", PORT, &hints, &res) != 0) return 1;
+    while (getaddrinfo("telehack.com", PORT, &hints, &res) != 0)
+		{
+			poll(NULL, 0, 500);
+		}
 
     int num_ips = 0;
     for (p = res; p != NULL; p = p->ai_next) num_ips++;
@@ -100,43 +102,36 @@ int main(int argc, char *argv[]) {
                 conns[i].total += n;
                 conns[i].buffer[conns[i].total] = '\0';
 
-                // Фильтруем мусор протокола Telnet
                 filter_telnet(conns[i].buffer, &conns[i].total);
 
                 if (conns[i].state == STATE_CONNECTING) {
-                    // Ищем приглашение системы
                     if (strstr(conns[i].buffer, "Command,") ||  strstr(conns[i].buffer, ".")) {
                         send(conns[i].fd, cmd, strlen(cmd), 0);
                         conns[i].state = STATE_COMMUNICATING;
-                        // Очищаем буфер для получения результата FIGlet
                         conns[i].total = 0;
                     }
                 } else if (conns[i].state == STATE_COMMUNICATING) {
-                    // Если нашли точку в конце строки — это конец вывода
                     if (strstr(conns[i].buffer, "\r\n.") ||  strstr(conns[i].buffer, "\n.")) {
                         
 			char *cmd_start = strstr(conns[i].buffer, "figlet /");
     
     if (cmd_start) {
-        /* 2. Находим конец строки, в которой была команда (символ \n) */
         char *art_start = strchr(cmd_start, '\n');
         
         if (art_start) {
-            art_start++; /* Смещаемся на один байт вперед, на начало самого арта */
+            art_start++;
             
-            /* 3. Ищем финальную точку Telehack, чтобы её отрезать */
             char *end_ptr = strstr(art_start, "\r\n.");
             if (end_ptr) {
-                *end_ptr = '\0'; /* Обрезаем строку по найденному адресу */
+                *end_ptr = '\0'; 
             }
 
-            /* 4. Выводим чистый результат */
             printf("%s\n", art_start);
 
         }
     }    
 			conns[i].state = STATE_DONE;
-                        running = 0; // Выходим из программы
+                        running = 0; 
                         break;
                     }
                 }
