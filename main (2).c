@@ -45,8 +45,15 @@ int main(int argc, char *argv[]) {
     }
 
     char cmd[512];
-    snprintf(cmd, sizeof(cmd), "figlet /%s %s\r\n", argv[1], argv[2]);
 
+	snprintf(cmd, sizeof(cmd), "figlet /%s", argv[1]);
+
+  for (int i = 2; i < argc; i++) {
+    strcat(cmd, " ");
+    strcat(cmd, argv[i]);
+  }
+  strcat(cmd, "\r\n");
+	
     struct addrinfo hints, *res, *p;
     memset(&hints, 0, sizeof hints);
     hints.ai_family = AF_INET;
