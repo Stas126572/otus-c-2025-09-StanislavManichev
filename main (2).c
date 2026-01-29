@@ -38,6 +38,22 @@ void filter_telnet(char *buf, size_t *len) {
     buf[j] = '\0';
 }
 
+void inizializete_sockets(struct connection *conns, struct addrinfo* res){
+	struct addrinfo* p = res;
+    for (int i = 0; i < num_ips; i++) {
+        conns[i].fd = socket(AF_INET, SOCK_STREAM, 0);
+        if (conns[i].fd >= 0) {
+            fcntl(conns[i].fd, F_SETFL, O_NONBLOCK);
+            memcpy(&conns[i].addr, p->ai_addr, p->ai_addrlen);
+            conns[i].addr_len = p->ai_addrlen;
+            connect(conns[i].fd, (struct sockaddr *)&conns[i].addr, conns[i].addr_len);
+        }
+        conns[i].state = STATE_CONNECTING;
+        p = p->ai_next;
+    }
+	freeaddrinfo(res);
+}
+
 int main(int argc, char *argv[]) {
     if (argc < 3) {
         fprintf(stderr, "Usage: %s <font> <text>\n", argv[0]);
@@ -69,7 +85,8 @@ int main(int argc, char *argv[]) {
 
     struct connection *conns = calloc((size_t)num_ips, sizeof(struct connection));
     struct pollfd *fds = calloc((size_t)num_ips, sizeof(struct pollfd));
-    
+
+	/*
     p = res;
     for (int i = 0; i < num_ips; i++) {
         conns[i].fd = socket(AF_INET, SOCK_STREAM, 0);
@@ -82,7 +99,8 @@ int main(int argc, char *argv[]) {
         conns[i].state = STATE_CONNECTING;
         p = p->ai_next;
     }
-    freeaddrinfo(res);
+	*/
+    //freeaddrinfo(res);
 
     int running = 1;
     while (running) {
