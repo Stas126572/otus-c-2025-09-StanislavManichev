@@ -1,7 +1,9 @@
 KERNEL_DIR ?= /lib/modules/$(shell uname -r)/build
 PWD := $(shell pwd)
+$(TARGET) ?= symbolic_driver
 
-obj-m += hello_world.o
+
+obj-m += $(TARGET).o
 
 all:
 	make -C $(KERNEL_DIR) M=$(PWD) modules
