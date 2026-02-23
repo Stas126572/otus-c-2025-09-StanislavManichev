@@ -24,7 +24,6 @@ static char *ring_devnode(struct device *dev, umode_t *mode) {
 }
 
 static int dev_open(struct inode *inodep, struct file *filep) {
-    pr_info("Ring Dev: открыт. Head=%u, Tail=%u\n", head, tail);
     return 0;
 }
 
@@ -66,7 +65,6 @@ static ssize_t dev_write(struct file *file, const char __user *buf, size_t len, 
         head = next; 
             }
 
-    pr_info("Ring Dev: записано %zu байт. Новая голова: %u\n", len, head);
     return len;
 }
 
@@ -120,7 +118,6 @@ static void __exit my_exit(void) {
     class_destroy(my_class);
     cdev_del(&my_cdev);
     unregister_chrdev_region(dev_num, 1);
-    pr_info("Ring Dev: Выгружен. До связи!\n");
 }
 
 module_init(my_init);
