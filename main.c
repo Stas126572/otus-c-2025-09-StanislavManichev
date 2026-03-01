@@ -78,25 +78,6 @@ void check_is_win_or_nichya() {
     state = NICHYA;
   }
 }
-/*
-void check_is_win_or_nichya() {
-  // Проверка победы (уже работает)
-  if (CHECK_GORIZONTALY_WIN || CHECK_VERTICALY_WIN || CHECK_DIAGONAL_WIN) {
-    if (state == WAITING_SECOND_PLAYER_STEP) state = FIRST_PLAYER_WIN;
-    else if (state == WAITING_FIRST_PLAYER_STEP) state = SECOND_PLAYER_WIN;
-    return; // Если победа, ничью не проверяем
-  }
-
-  // Исправленная проверка ничьи
-  if (CHECK_NICHYA) {
-    // Ждем, пока состояние станет "WAITING...", это значит, что последний символ 
-    // уже прошел через update() и готов к отрисовке в текущем кадре
-    if (state == WAITING_FIRST_PLAYER_STEP || state == WAITING_SECOND_PLAYER_STEP) {
-        state = NICHYA;
-    }
-  }
-}
-*/
 void render() {
 
   SDL_Rect rect;
@@ -152,7 +133,7 @@ void render() {
 
 void update() {
   if (cell_index < 0 || cell_index > 8)
-    return; // ЗАЩИТА ОТ ВЫЛЕТА
+    return;
 
   if (symbols[cell_index] == 0) {
     switch (state) {
@@ -166,7 +147,6 @@ void update() {
       break;
     }
   }
-  //check_is_win_or_nichya();
 }
 
 
@@ -177,7 +157,7 @@ int main() {
   SDL_Init(SDL_INIT_VIDEO);
   TTF_Init();
 
-  SDL_Window *win = SDL_CreateWindow("SDL2 Text", 0, 0, WIN_SIZE, WIN_SIZE, 0);
+  SDL_Window *win = SDL_CreateWindow("Notes and crosses", 0, 0, WIN_SIZE, WIN_SIZE, 0);
   ren = SDL_CreateRenderer(win, -1, SDL_RENDERER_ACCELERATED);
   font = TTF_OpenFont("/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf", 200);
 
@@ -236,55 +216,7 @@ int main() {
   bool quit = false;
   while (!quit) {
     SDL_Event event;
-    while (SDL_PollEvent(&event)) {
-      switch (event.type) {
-      case SDL_QUIT:
-        quit = true;
-        break;
-
-      case SDL_KEYDOWN:
-        if (event.key.repeat == 0) {
-          switch (event.key.keysym.sym) {
-          case SDLK_q:
-            quit = true;
-            break;
-          case SDLK_o:
-            if (state == CHOOSE_FIRST_PLAYER_LETTER)
-              state = LETTER_HAVE_CHOSEN;
-            break;
-          case SDLK_x:
-            if (state == CHOOSE_FIRST_PLAYER_LETTER) {
-              SDL_Texture *v3 = tex_second_player_symbol;
-              tex_second_player_symbol = tex_first_player_symbol;
-              tex_first_player_symbol = v3;
-              state = LETTER_HAVE_CHOSEN;
-            }
-            break;
-          case SDLK_c:
-            if (state == FIRST_PLAYER_WIN || state == SECOND_PLAYER_WIN ||
-                state == NICHYA) {
-              memset(symbols, 0, 9);
-              state = CHOOSE_FIRST_PLAYER_LETTER;
-            }
-          }
-        }
-        break;
-
-      case SDL_MOUSEBUTTONDOWN:
-        int x = event.motion.x;
-        int y = event.motion.y;
-        cell_index = MIN(x / FRAME_SIZE, 2) + 3 * MIN(y / FRAME_SIZE, 2);
-        switch (state) {
-        case WAITING_FIRST_PLAYER_STEP:
-          state = FIRST_PLAYER_STEP;
-          break;
-        case WAITING_SECOND_PLAYER_STEP:
-          state = SECOND_PLAYER_STEP;
-          break;
-        }
-        update();
-        break;
-      }
+   
     
       double start = getCurrentTime();
       processInput();
