@@ -7,7 +7,12 @@
 #define REPEATE_4(x) REPEATE_2(x), REPEATE_2(x)
 #define REPEATE_8(x) REPEATE_4(x), REPEATE_4(x)
 
-typedef enum Error_Type { NULL_ERROR, INCORRECT_ARGC, NOT_INTEGER, SUCCESS } Error_Type;
+typedef enum Error_Type {
+  NULL_ERROR,
+  INCORRECT_ARGC,
+  NOT_INTEGER,
+  SUCCESS
+} Error_Type;
 
 static int count_values(void *unused __attribute__((unused)), int argc,
                         char **argv, char **col_name __attribute__((unused))) {
@@ -21,8 +26,8 @@ static int count_values(void *unused __attribute__((unused)), int argc,
 static int check_type(void *error_type, int argc, char **argv,
                       char **col_name __attribute__((unused))) {
   if (argc != 1) {
-          *((Error_Type *)error_type) = INCORRECT_ARGC;
-          return 1;
+    *((Error_Type *)error_type) = INCORRECT_ARGC;
+    return 1;
   }
   if (strcmp(argv[0], "null") == 0) {
     *((Error_Type *)error_type) = NONE;
