@@ -7,12 +7,12 @@
 #define REPEATE_4(x) REPEATE_2(x), REPEATE_2(x)
 #define REPEATE_8(x) REPEATE_4(x), REPEATE_4(x)
 
-typedef enum Error_Type { NONE, NOT_INTEGER, SUCCESS } Error_Type;
+typedef enum Error_Type { NULL_ERROR, INCORRECT_ARGC, NOT_INTEGER, SUCCESS } Error_Type;
 
 static int count_values(void *unused __attribute__((unused)), int argc,
                         char **argv, char **col_name __attribute__((unused))) {
   if (argc != 5)
-    return -1;
+    return 1;
   printf("AVG: %d\nMAX: %d\nMIN: %d\nSUM: %d\nVAR: %d\n", atoi(argv[0]),
          atoi(argv[1]), atoi(argv[2]), atoi(argv[3]), atoi(argv[4]));
   return 0;
@@ -20,18 +20,20 @@ static int count_values(void *unused __attribute__((unused)), int argc,
 
 static int check_type(void *error_type, int argc, char **argv,
                       char **col_name __attribute__((unused))) {
-  if (argc != 1)
-    return -1;
+  if (argc != 1) {
+          *((Error_Type *)error_type) = INCORRECT_ARGC;
+          return 1;
+  }
   if (strcmp(argv[0], "null") == 0) {
     *((Error_Type *)error_type) = NONE;
-    return EXIT_FAILURE;
+    return 1;
   }
   if (strcmp(argv[0], "integer") != 0) {
     *((Error_Type *)error_type) = NOT_INTEGER;
-    return EXIT_FAILURE;
+    return 1;
   }
   *((Error_Type *)error_type) = SUCCESS;
-  return EXIT_SUCCESS;
+  return 0;
 }
 
 int main(int argc, char **argv) {
@@ -66,6 +68,9 @@ int main(int argc, char **argv) {
       break;
     case NOT_INTEGER:
       fprintf(stderr, "The column isn't integer type.");
+      break;
+    case INCORRECT_ARGC:
+      fprintf(stderr, "Incorrect column of argv.");
       break;
     default:
       fprintf(stderr, "SQL Error: %s\n", err_message);
